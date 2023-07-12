@@ -1,0 +1,44 @@
+---
+- hosts: localhost
+  become: yes
+  handlers:
+    - name: Restart MySQL
+      service:
+        name: mysql
+        state: restarted
+  tasks:
+
+  - name: install apt packages
+    apt:
+      update_cache: yes
+      state: latest
+      pkg:
+      - git
+      - mcrypt
+      - nginx
+      - mariadb
+      - php7.4
+      - php7.4-gd
+      - php7.4-curl
+      - php7.4-zip
+      - php7.4-xml
+      - php7.4-mbstring
+      - php7.4-mysql
+      - php7.4-bz2
+      - php7.4-intl
+      - php7.4-imap
+      - php7.4-gmp
+      - php7.4-bcmath
+
+  - name: Change mysql datadir
+    blockinfile:
+      path: /etc/mysql/my.cnf
+      block: |
+        [mysqld]
+        datadir=/mnt/data-blue/mysql-nextcloud/
+    notify: Restart MySQL  # Optional: Trigger MySQL service restart if file is modified
+
+  - name: Create db
+    mysql_db:
+      name: nextcloud
+      state: present
